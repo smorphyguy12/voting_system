@@ -1,0 +1,2 @@
+<!-- Layout -->
+@include('partials/sidenav')
