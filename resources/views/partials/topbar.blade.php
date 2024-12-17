@@ -63,16 +63,18 @@
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ asset('assets/images/users/profile.png') }}" alt="user-image" class="rounded-circle">
                     <span class="ms-1 d-none d-md-inline-block">
-                        {{ Auth::user()->name }} <i class="mdi mdi-chevron-down"></i>
+                        {{ Auth::user()->full_name }} <i class="mdi mdi-chevron-down"></i>
                     </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
-                    <!-- item-->
-                    <a href="{{ route('logout') }}" class="dropdown-item notify-item">
+                    <!-- Logout item-->
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;">
+                        @csrf
+                    </form>
+                    <a href="#" class="dropdown-item notify-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="fe-log-out"></i>
                         <span>Logout</span>
                     </a>
-
                 </div>
             </li>
 

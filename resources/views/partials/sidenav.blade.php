@@ -4,15 +4,15 @@
     <!-- Brand Logo -->
     <div class="logo-box">
         <!-- Brand Logo Light -->
-        <a href="{{ route('home') }}" class="logo-light">
-            <img src="assets/images/logo-sidebar-light.png" alt="logo" style="padding: 5px; height: 60px;" class="logo-lg">
-            <img src="assets/images/logo.png" alt="small logo" style="padding: 5px; height: 39px;" class="logo-sm">
+        <a href="{{ route('student.dashboard') }}" class="logo-light">
+            <img src="{{ asset('assets/images/logo-sidebar-light.png') }}" alt="logo" style="padding: 5px; height: 60px;" class="logo-lg">
+            <img src="{{ asset('assets/images/logo.png" alt="small logo') }}" style="padding: 5px; height: 39px;" class="logo-sm">
         </a>
 
         <!-- Brand Logo Dark -->
-        <a href="{{ route('home') }}" class="logo-dark text-center">
-            <img src="assets/images/logo-sidebar-dark.png" alt="dark logo" style="padding: 5px; height: 60px;" class="logo-lg">
-            <img src="assets/images/logo.png" alt="small logo" style="padding: 5px; height: 39px;" class="logo-sm">
+        <a href="{{ route('student.dashboard') }}" class="logo-dark text-center">
+            <img src="{{ asset('assets/images/logo-sidebar-dark.png') }}" alt="dark logo" style="padding: 5px; height: 60px;" class="logo-lg">
+            <img src="{{ asset('assets/images/logo.png') }}" alt="small logo" style="padding: 5px; height: 39px;" class="logo-sm">
         </a>
     </div>
 
@@ -52,7 +52,7 @@
 
                 </div>
             </div>
-            <p class="text-muted mb-0">Admin Head</p>
+            <p class="text-muted mb-0">Student</p>
         </div>
 
         <!--- Menu -->
@@ -61,7 +61,7 @@
             <li class="menu-title">Home</li>
 
             <li class="menu-item">
-                <a href="{{ route('home') }}" class="menu-link">
+                <a href="{{ route('student.dashboard') }}" class="menu-link">
                     <span class="menu-icon"><i data-feather="airplay"></i></span>
                     <span class="menu-text"> Dashboard </span>
                 </a>

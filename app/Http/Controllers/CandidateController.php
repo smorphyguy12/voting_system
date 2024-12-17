@@ -42,12 +42,12 @@ class CandidateController extends Controller
             'user_id' => [
                 'required',
                 'exists:users,id',
-                // Ensure student is not already a candidate in active/upcoming elections
                 function ($attribute, $value, $fail) use ($request) {
-                    $existingCandidate = Candidate::whereHas('election', function ($query) {
-                        $query->whereIn('status', ['active', 'upcoming']);
-                    })->where('user_id', $value)
+                    $existingCandidate = Candidate::where('user_id', $value)
                         ->where('election_id', $request->election_id)
+                        ->whereHas('election', function ($query) {
+                            $query->whereIn('status', ['active', 'upcoming']);
+                        })
                         ->exists();
 
                     if ($existingCandidate) {
@@ -58,16 +58,14 @@ class CandidateController extends Controller
             'election_id' => 'required|exists:elections,id',
             'candidate_role' => 'required|in:President,Vice President,Secretary,Treasurer',
             'platform' => 'nullable|string|max:1000',
-            'avatar' => 'nullable|image|max:2048' // 2MB max
+            'avatar' => 'nullable|image|max:5048'
         ]);
 
-        // Handle avatar upload
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('candidate_avatars', 'public');
         }
 
-        // Create candidate
         $candidate = Candidate::create([
             'user_id' => $validatedData['user_id'],
             'election_id' => $validatedData['election_id'],
@@ -80,9 +78,51 @@ class CandidateController extends Controller
             ->with('success', 'Candidate registered successfully');
     }
 
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'election_id' => 'required|exists:elections,id',
+            'candidate_role' => 'required|in:President,Vice President,Secretary,Treasurer',
+            'platform' => 'nullable|string|max:1000',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5048'
+        ]);
+
+        try {
+            $candidate = Candidate::findOrFail($id);
+
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($candidate->profile_picture && Storage::exists('public/candidate_avatars/' . $candidate->profile_picture)) {
+                    Storage::delete('public/candidate_avatars/' . $candidate->profile_picture);
+                }
+
+                // Store new profile picture
+                $profilePictureName = time() . '_' . $request->file('profile_picture')->getClientOriginalName();
+                $request->file('profile_picture')->storeAs('public/candidate_avatars', $profilePictureName);
+
+                $validatedData['profile_picture'] = $profilePictureName;
+            }
+
+            $candidate->update([
+                'user_id' => $validatedData['user_id'],
+                'election_id' => $validatedData['election_id'],
+                'candidate_role' => $validatedData['candidate_role'],
+                'platform' => $validatedData['platform'] ?? null,
+                'profile_picture' => $validatedData['profile_picture'] ?? $candidate->profile_picture
+            ]);
+
+            return redirect()->route('admin.candidates.index')
+                ->with('success', 'Candidate profile updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Unable to update candidate profile. Please try again.')
+                ->withInput();
+        }
+    }
+
     public function show(Candidate $candidate)
     {
-        // Detailed candidate view with vote analytics
         $voteCount = $candidate->votes()->count();
         $votePercentage = $this->calculateVotePercentage($candidate);
 

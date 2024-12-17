@@ -1,22 +1,32 @@
+<?php
+$title = "Elections Management";
+$sideBar = "partials/admin-sidebar";
+?>
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        @include('partials.admin-sidebar')
-        
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Elections Management</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <div class="d-flex align-items-center mb-3">
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createElectionModal">
                         <i class="fas fa-plus"></i> Create New Election
                     </button>
                 </div>
             </div>
+            <h4 class="page-title">Elections Management</h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
 
+<div class="row">
+    <div class="card">
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table id="electionsTable" class="table table-hover table-bordered">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -47,9 +57,10 @@
                                     <a href="{{ route('admin.elections.show', $election->id) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <button class="btn btn-sm btn-warning edit-election" data-id="{{ $election->id }}">
+                                    <a href="{{ route('admin.elections.edit', $election->id) }}"
+                                        class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
-                                    </button>
+                                    </a>
                                     <button class="btn btn-sm btn-danger delete-election" data-id="{{ $election->id }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -60,7 +71,7 @@
                     </tbody>
                 </table>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 
@@ -77,7 +88,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Election Name</label>
-                        <input type="text" class="form-control" name="name" required>
+                        <input type="text" class="form-control" name="name" placeholder="Enter election name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Start Date</label>
@@ -98,27 +109,80 @@
 </div>
 @endsection
 
+@push('styles')
+<!-- third party css -->
+<link href="{{ asset('assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/libs/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/libs/datatables.net-select-bs5/css//select.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<!-- third party css end -->
+@push('endpush')
+
 @push('scripts')
+<script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
+<script src="{{ asset('assets/libs/datatables.net-select/js/dataTables.select.min.js') }}"></script>
+<script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}"></script>
+<script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Delete Election Handler
-    document.querySelectorAll('.delete-election').forEach(button => {
-        button.addEventListener('click', function() {
+    $(document).ready(function() {
+        $('#electionsTable').DataTable();
+
+        $(document).on('click', '.delete-election', function(e) {
+            e.preventDefault();
             const electionId = this.dataset.id;
-            if(confirm('Are you sure you want to delete this election?')) {
-                fetch(`/admin/elections/${electionId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                }).then(response => {
-                    if(response.ok) {
-                        this.closest('tr').remove();
-                    }
-                });
-            }
+            const $row = $(this).closest('tr');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/elections/${electionId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Deletion failed');
+                            }
+                            return response.json();
+                        })
+                        .then(() => {
+                            $row.remove();
+                            Swal.fire(
+                                'Deleted!',
+                                'The election has been deleted.',
+                                'success'
+                            );
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire(
+                                'Error!',
+                                'Could not delete the election.',
+                                'error'
+                            );
+                        });
+                }
+            });
         });
     });
-});
 </script>
 @endpush

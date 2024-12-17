@@ -67,6 +67,7 @@ $title = "Login"; ?>
                                     value="{{ old('student_id') }}"
                                     required
                                     autocomplete="student_id"
+                                    placeholder="Enter Student ID"
                                     autofocus>
                                 @error('student_id')
                                 <span class="invalid-feedback" role="alert">
@@ -83,6 +84,7 @@ $title = "Login"; ?>
                                         type="password"
                                         class="form-control @error('password') is-invalid @enderror"
                                         name="password"
+                                        placeholder="Enter Password"
                                         required
                                         autocomplete="current-password">
                                     <div class="input-group-text toggle-password" data-target="password">
