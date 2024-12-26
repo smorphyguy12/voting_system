@@ -145,12 +145,13 @@ class CandidateController extends Controller
 
     public function edit(Candidate $candidate)
     {
-        $elections = Election::where('status', '!=', 'closed')->get();
+        $elections = Election::all();
         $students = User::all();
 
         return view('admin.candidates.edit', [
             'candidate' => $candidate,
             'elections' => $elections,
+
             'students' => $students
         ]);
     }

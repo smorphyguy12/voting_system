@@ -101,11 +101,21 @@ $sideBar = "partials/admin-sidebar";
                                     class="form-select select2"
                                     required>
                                     @foreach($elections as $election)
+                                    @if ($election->status == 'closed')
+                                    <option
+                                        value="{{ $election->id }} {{ $candidate->election_id == $election->id ? 'selected' : '' }}>
+                                        {{ $election->name }}"
+                                        disabled>
+                                        {{ $election->name }} (Closed)
+                                    </option>
+                                    @else
                                     <option
                                         value="{{ $election->id }}"
                                         {{ $candidate->election_id == $election->id ? 'selected' : '' }}>
                                         {{ $election->name }}
                                     </option>
+                                    @endif
+
                                     @endforeach
                                 </select>
 

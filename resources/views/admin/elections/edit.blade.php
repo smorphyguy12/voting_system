@@ -46,15 +46,7 @@ $sideBar = "partials/admin-sidebar";
                     @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select name="status" id="status" class="form-select">
-                        <option value="upcoming" {{ (old('status') ?? $election->status) == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                        <option value="active" {{ (old('status') ?? $election->status) == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="closed" {{ (old('status') ?? $election->status) == 'closed' ? 'selected' : '' }}>Closed</option>
-                    </select>
+                    
                 </div>
 
                 <div class="row">
@@ -87,6 +79,15 @@ $sideBar = "partials/admin-sidebar";
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="name" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select select2" required>
+                        <option value="upcoming" {{ (old('status')?? $election->status) == 'upcoming' ?'selected' : '' }}>Upcoming</option>
+                        <option value="active" {{ (old('status')?? $election->status) == 'active' ?'selected' : '' }}>Active</option>
+                        <option value="closed" {{ (old('status')?? $election->status) == 'closed' ?'selected' : '' }}>Closed</option>
+                    </select>
+                </div>
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Update Election</button>
                 </div>
@@ -95,3 +96,17 @@ $sideBar = "partials/admin-sidebar";
     </form>
 </div>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('assets/libs/select2/css/select2.min.css') }}">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
+@endpush

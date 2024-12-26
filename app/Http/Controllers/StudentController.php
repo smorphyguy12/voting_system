@@ -18,6 +18,7 @@ class StudentController extends Controller
 
         // Get active elections
         $activeElections = Election::where('status', 'active')->get();
+        $upcomingElections = Election::where('status', 'upcoming')->get();
 
         // Check if student has already voted in these elections
         $votedElectionIds = $user->votes()
@@ -29,7 +30,8 @@ class StudentController extends Controller
 
         return view('student.dashboard', [
             'activeElections' => $activeElections,
-            'votedElectionIds' => $votedElectionIds
+            'votedElectionIds' => $votedElectionIds,
+            'upcomingElections' => $upcomingElections
         ]);
     }
 
